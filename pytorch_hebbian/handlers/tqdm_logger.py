@@ -27,7 +27,7 @@ class OutputHandler(BaseOutputHandler):
         if not isinstance(logger, TqdmLogger):
             raise RuntimeError("Handler 'OutputHandler' works only with TqdmLogger")
 
-        metrics = self._setup_output_metrics(engine)
+        metrics = self._setup_output_metrics_state_attrs(engine)
 
         global_step = self.global_step_transform(engine, event_name)
 
@@ -42,17 +42,17 @@ class OutputHandler(BaseOutputHandler):
         for key, value in metrics.items():
             if isinstance(value, numbers.Number) or isinstance(value, torch.Tensor) and value.ndimension() == 0:
                 if value > 1e4:
-                    metrics_str.append("{}={:.4e}".format(key, value))
+                    metrics_str.append("{}: {:.4e}".format(" ".join(key), value))
                 else:
-                    metrics_str.append("{}={:.4f}".format(key, value))
+                    metrics_str.append("{}: {:.4f}".format(" ".join(key), value))
             elif isinstance(value, torch.Tensor) and value.ndimension() == 1:
                 for i, v in enumerate(value):
-                    metrics_str.append("{}{}={}".format(key, i, v.item()))
+                    metrics_str.append("{}: {}".format(f"{key} {i}", v.item()))
             else:
                 warnings.warn(
                     "TqdmLogger output_handler can not log " "metrics value type {}".format(type(value))
                 )
-        logger.pbar.log_message(message + ", ".join(metrics_str))
+        logger.pbar.log_message(message + "\t".join(metrics_str))
 
 
 class TqdmLogger(BaseLogger):

@@ -110,11 +110,11 @@ class HebbianEvaluator(Evaluator):
 
     def _run(self, train_loader, val_loader):
         self.logger.info(
-            "Supervised training from layer '{}'.".format(list(self.model.named_children())[self.supervised_from][0]))
+            "Supervised training from layer '{}'.".format(list(self.model.layers.named_children())[self.supervised_from][0]))
 
         self._init(train_loader, val_loader)
 
-        layers = list(self.model.children())
+        layers = list(self.model.layers.children())
         # Freeze the Hebbian trained layers
         for layer in layers[:self.supervised_from]:
             for param in layer.parameters():

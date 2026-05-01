@@ -86,7 +86,7 @@ class HebbianTrainer(Trainer):
         # Get the Hebbian trainable layers
         Layer = namedtuple('Layer', ['idx', 'name', 'layer'])
         self.layers = []
-        for idx, (name, layer) in enumerate(list(model.named_children())[:self.supervised_from]):
+        for idx, (name, layer) in enumerate(list(model.layers.named_children())[:self.supervised_from]):
             if (type(layer) == torch.nn.Linear or type(layer) == torch.nn.Conv2d) and name not in self.freeze_layers:
                 self.layers.append(Layer(idx, name, layer))
 
@@ -177,7 +177,7 @@ class HebbianTrainer(Trainer):
         if self.complete_forward:
             model(inputs)
         else:
-            layers = list(model.children())
+            layers = list(model.layers.children())
             x = inputs
             for lyr in layers[:self.supervised_from - 1]:
                 x = lyr(x)
